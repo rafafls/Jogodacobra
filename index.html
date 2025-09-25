@@ -8,9 +8,9 @@
   @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
   :root{--bg:#0f1724;--panel:#0b1220;--accent:#16a34a;--muted:#94a3b8}
   *{box-sizing:border-box;font-family:Inter,Segoe UI,Arial,sans-serif}
-  body{margin:0;min-height:100vh;display:flex;justify-content:center;align-items:center;background:linear-gradient(180deg,#071226,#0b1220);color:#e6eef8}
+  body{margin:0;min-height:100vh;display:flex;justify-content:center;align-items:center;background:linear-gradient(180deg,#071226,#0b1220);color:#e6eef8;overflow:hidden;}
   .container{width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:20px;padding:10px}
-  canvas{background:#071127;border-radius:12px;display:block;width:100%;height:auto;touch-action:none}
+  canvas{background:#071127;border-radius:12px;display:block;width:100%;height:auto;touch-action:none;}
   .panel{background:rgba(255,255,255,.02);padding:12px;border-radius:12px;width:100%;color:#e6eef8}
   h1{font-size:16px;margin:0 0 8px;text-align:center}
   .controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px}
@@ -62,7 +62,7 @@ snakeImg.src = 'cobra.png';
 const foodImg = new Image();
 foodImg.src = 'comida.png';
 
-// Ajuste pequeno e proporcional
+// Ajuste proporcional e pequeno
 function resizeCanvas() {
   const size = Math.min(window.innerWidth - 20, 300);
   canvas.width = size;
@@ -72,17 +72,23 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-// Swipe funcional
+// Swipe funcional sem scroll
 let touchStartX = 0, touchStartY = 0;
 const swipeThreshold = 20;
 
 canvas.addEventListener('touchstart', e=>{
+  e.preventDefault();
   const t = e.touches[0];
   touchStartX = t.clientX;
   touchStartY = t.clientY;
 });
 
+canvas.addEventListener('touchmove', e=>{
+  e.preventDefault();
+});
+
 canvas.addEventListener('touchend', e=>{
+  e.preventDefault();
   const t = e.changedTouches[0];
   const dx = t.clientX - touchStartX;
   const dy = t.clientY - touchStartY;
@@ -203,4 +209,5 @@ reset();
 </script>
 </body>
 </html>
+
 
