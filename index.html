@@ -9,14 +9,16 @@
   :root{--bg:#0f1724;--panel:#0b1220;--accent:#16a34a;--muted:#94a3b8}
   *{box-sizing:border-box;font-family:Inter,Segoe UI,Arial,sans-serif}
   body{margin:0;min-height:100vh;display:flex;justify-content:center;align-items:center;background:linear-gradient(180deg,#071226,#0b1220);color:#e6eef8;overflow:hidden;}
-  .container{width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:20px;padding:10px}
-  canvas{background:#071127;border-radius:12px;display:block;width:100%;height:auto;touch-action:none;}
-  .panel{background:rgba(255,255,255,.02);padding:12px;border-radius:12px;width:100%;color:#e6eef8}
+  .container{width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:10px;padding:10px}
+  canvas{background:#071127;border-radius:12px;display:block;width:100%;height:auto;}
+  .panel{background:rgba(255,255,255,.02);padding:12px;border-radius:12px;width:100%;color:#e6eef8;text-align:center}
   h1{font-size:16px;margin:0 0 8px;text-align:center}
   .controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px}
   button{background:#0b1220;border:1px solid rgba(255,255,255,.04);padding:6px 10px;border-radius:8px;color:#e6eef8;cursor:pointer;font-size:12px}
   .btn-primary{background:linear-gradient(90deg,#10b981,#059669);border:none;padding:8px 12px;font-weight:600}
   .score{font-size:14px;color:var(--muted);margin-top:4px;text-align:center}
+  .dir-buttons{display:grid;grid-template-columns:60px 60px 60px;gap:5px;margin-top:10px;justify-content:center;}
+  .dir-buttons button{width:60px;height:60px;font-size:14px;font-weight:bold;}
   ol{margin:4px 0 0 18px;padding:0;color:var(--muted)}
 </style>
 </head>
@@ -34,6 +36,11 @@
     </div>
     <div style="margin-top:8px;">
       <label><input type="checkbox" id="wrap"> Voltar pelas bordas</label>
+    </div>
+    <div class="dir-buttons">
+      <div></div><button id="up">↑</button><div></div>
+      <button id="left">←</button><div></div><button id="right">→</button>
+      <div></div><button id="down">↓</button><div></div>
     </div>
     <div style="margin-top:8px;">Melhores Pontuações</div>
     <ol id="highscoreList"></ol>
@@ -62,7 +69,7 @@ snakeImg.src = 'cobra.png';
 const foodImg = new Image();
 foodImg.src = 'comida.png';
 
-// Ajuste proporcional e pequeno
+// Canvas proporcional
 function resizeCanvas() {
   const size = Math.min(window.innerWidth - 20, 300);
   canvas.width = size;
@@ -71,35 +78,6 @@ function resizeCanvas() {
 }
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
-
-// Swipe funcional sem scroll
-let touchStartX = 0, touchStartY = 0;
-const swipeThreshold = 20;
-
-canvas.addEventListener('touchstart', e=>{
-  e.preventDefault();
-  const t = e.touches[0];
-  touchStartX = t.clientX;
-  touchStartY = t.clientY;
-});
-
-canvas.addEventListener('touchmove', e=>{
-  e.preventDefault();
-});
-
-canvas.addEventListener('touchend', e=>{
-  e.preventDefault();
-  const t = e.changedTouches[0];
-  const dx = t.clientX - touchStartX;
-  const dy = t.clientY - touchStartY;
-  if(Math.abs(dx) > Math.abs(dy)){
-    if(dx > swipeThreshold && dir.x !== -1) dir={x:1,y:0};
-    else if(dx < -swipeThreshold && dir.x !== 1) dir={x:-1,y:0};
-  } else {
-    if(dy > swipeThreshold && dir.y !== -1) dir={x:0,y:1};
-    else if(dy < -swipeThreshold && dir.y !== 1) dir={x:0,y:-1};
-  }
-});
 
 // Funções do jogo
 function reset(){
@@ -199,7 +177,13 @@ window.addEventListener('keydown', e=>{
   if(dir2){ if(dir.x===-dir2[0]&&dir.y===-dir2[1]) return; dir={x:dir2[0],y:dir2[1]}; }
 });
 
-// Botões
+// Botões de controle
+document.getElementById('up').addEventListener('click', ()=>{ if(dir.y!==1) dir={x:0,y:-1}; });
+document.getElementById('down').addEventListener('click', ()=>{ if(dir.y!==-1) dir={x:0,y:1}; });
+document.getElementById('left').addEventListener('click', ()=>{ if(dir.x!==1) dir={x:-1,y:0}; });
+document.getElementById('right').addEventListener('click', ()=>{ if(dir.x!==-1) dir={x:1,y:0}; });
+
+// Botões de jogo
 startBtn.addEventListener('click', ()=>{ paused=false; reset(); });
 pauseBtn.addEventListener('click', ()=>{ paused=!paused; if(!paused) run(); pauseBtn.textContent=paused?'Retomar':'Pausar'; });
 speedUp.addEventListener('click', ()=>{ if(speed<20) speed++; tickInterval=1000/speed; });
@@ -209,5 +193,6 @@ reset();
 </script>
 </body>
 </html>
+
 
 
