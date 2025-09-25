@@ -175,6 +175,11 @@ function resizeCanvas(){
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
+  // Permitir scroll no site, mesmo com toque no canvas
+canvas.addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
+canvas.addEventListener('touchmove', e => e.stopPropagation(), { passive: true });
+canvas.addEventListener('touchend', e => e.stopPropagation(), { passive: true });
+
 function reset(){
   snake = [{x:12,y:12},{x:11,y:12},{x:10,y:12}];
   dir={x:1,y:0};
@@ -282,6 +287,7 @@ document.getElementById('right').addEventListener('click', ()=>{ if(dir.x!==-1) 
 // Botões do jogo
 startBtn.addEventListener('click', ()=>{ paused=false; reset(); });
 pauseBtn.addEventListener('click', ()=>{ paused=!paused; if(!paused) run(); pauseBtn.textContent=paused?'Retomar':'Pausar';
+
 
 
 
