@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Coma o </title>
+  <title>Jogo da Cobrinha</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
     :root{--bg:#0f1724;--panel:#0b1220;--accent:#16a34a;--muted:#94a3b8}
     *{box-sizing:border-box;font-family:Inter,Segoe UI,Arial,sans-serif}
-    body{margin:0;min-height:100vh;display:grid;place-items:center;background:linear-gradient(180deg,#071226, #0b1220);color:#e6eef8}
+    body{margin:0;min-height:100vh;display:grid;place-items:center;background:linear-gradient(180deg,#071226,#0b1220);color:#e6eef8}
     .wrap{width:760px;max-width:95%;display:grid;grid-template-columns:1fr 260px;gap:20px;align-items:start}
     canvas{background:#071127;border-radius:12px;display:block;width:100%;height:auto;box-shadow:0 8px 30px rgba(2,6,23,.7)}
     .panel{background:rgba(255,255,255,.02);padding:18px;border-radius:12px;min-height:220px}
@@ -26,7 +26,7 @@
 <body>
   <div class="wrap">
     <div>
-      <canvas id="game" width="520" height="520"></canvas>
+      <canvas id="game"></canvas>
       <footer>Use as setas ou WASD para controlar. Pressione <span class="kbd">Espaço</span> para pausar.</footer>
     </div>
 
@@ -65,7 +65,7 @@
     const highscoreListEl = document.getElementById('highscoreList');
 
     const GRID = 26;
-    const CELL = canvas.width / GRID;
+    let CELL;
 
     let snake, dir, food, loopId, speed, paused, score, gameOverFlag;
     let highscores = JSON.parse(localStorage.getItem('snakeHighscores')) || [];
@@ -75,31 +75,15 @@
     const foodImg = new Image();
     foodImg.src = 'comida.png';
 
-    // Detectar gestos de swipe no celular
-  let touchStartX = 0;
-  let touchStartY = 0;
+    function resizeCanvas() {
+      let size = Math.min(window.innerWidth * 0.9, 520);
+      canvas.width = size;
+      canvas.height = size;
+      CELL = canvas.width / GRID;
+    }
 
-  canvas.addEventListener('touchstart', e => {
-  const touch = e.touches[0];
-  touchStartX = touch.clientX;
-  touchStartY = touch.clientY;
-  }, false);
-
-  canvas.addEventListener('touchend', e => {
-  const touch = e.changedTouches[0];
-  const dx = touch.clientX - touchStartX;
-  const dy = touch.clientY - touchStartY;
-
-    if(Math.abs(dx) > Math.abs(dy)) {
-    // movimento horizontal
-    if(dx > 30 && dir.x !== -1) dir = {x:1, y:0}; // direita
-    else if(dx < -30 && dir.x !== 1) dir = {x:-1, y:0}; // esquerda
-    } else {
-    // movimento vertical
-    if(dy > 30 && dir.y !== -1) dir = {x:0, y:1}; // baixo
-    else if(dy < -30 && dir.y !== 1) dir = {x:0, y:-1}; // cima
-  }
-  }, false);  
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
 
     function reset(){
       snake = [{x:12,y:12},{x:11,y:12},{x:10,y:12}];
@@ -146,18 +130,14 @@
         ctx.drawImage(snakeImg, s.x*CELL + (CELL-snakeSize)/2, s.y*CELL + (CELL-snakeSize)/2, snakeSize, snakeSize);
       }
 
-      ctx.strokeStyle = 'rgba(255,255,255,0.04)';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(0.5,0.5,canvas.width-1,canvas.height-1);
-
       if(gameOverFlag){
         ctx.fillStyle = '#ff0000';
-        ctx.font = '32px "Press Start 2P", monospace';
+        ctx.font = '24px "Press Start 2P", monospace';
         ctx.textAlign = 'center';
         ctx.fillText('GAME OVER', canvas.width/2, canvas.height/2);
         ctx.fillStyle = '#ffffff';
-        ctx.font = '20px "Press Start 2P", monospace';
-        ctx.fillText('Pontuação: ' + score, canvas.width/2, canvas.height/2 + 40);
+        ctx.font = '16px "Press Start 2P", monospace';
+        ctx.fillText('Pontuação: ' + score, canvas.width/2, canvas.height/2 + 30);
       }
     }
 
