@@ -17,8 +17,9 @@
   button{background:#0b1220;border:1px solid rgba(255,255,255,.04);padding:6px 10px;border-radius:8px;color:#e6eef8;cursor:pointer;font-size:12px}
   .btn-primary{background:linear-gradient(90deg,#10b981,#059669);border:none;padding:8px 12px;font-weight:600}
   .score{font-size:14px;color:var(--muted);margin-top:4px;text-align:center}
-  .dir-buttons{display:grid;grid-template-columns:60px 60px 60px;gap:5px;margin-top:10px;justify-content:center;}
-  .dir-buttons button{width:60px;height:60px;font-size:14px;font-weight:bold;}
+  .dir-buttons{display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:10px;gap:5px;}
+  .dir-buttons .row{display:flex;gap:5px;}
+  .dir-buttons button{width:60px;height:60px;font-size:18px;font-weight:bold;}
   ol{margin:4px 0 0 18px;padding:0;color:var(--muted)}
 </style>
 </head>
@@ -37,17 +38,20 @@
     <div style="margin-top:8px;">
       <label><input type="checkbox" id="wrap"> Voltar pelas bordas</label>
     </div>
+
+    <!-- BOTÕES DE DIREÇÃO -->
     <div class="dir-buttons">
-      <div></div><button id="up">↑</button><div></div>
-      <button id="left">←</button><div></div><button id="right">→</button>
-      <div></div><button id="down">↓</button><div></div>
+      <div class="row"><button id="up">↑</button></div>
+      <div class="row"><button id="left">←</button><button id="down">↓</button><button id="right">→</button></div>
     </div>
+
     <div style="margin-top:8px;">Melhores Pontuações</div>
     <ol id="highscoreList"></ol>
   </div>
 </div>
 
 <script>
+// --- Mesma lógica do jogo ---
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 const scoreEl = document.getElementById('score');
@@ -177,13 +181,13 @@ window.addEventListener('keydown', e=>{
   if(dir2){ if(dir.x===-dir2[0]&&dir.y===-dir2[1]) return; dir={x:dir2[0],y:dir2[1]}; }
 });
 
-// Botões de controle
+// Botões de direção
 document.getElementById('up').addEventListener('click', ()=>{ if(dir.y!==1) dir={x:0,y:-1}; });
 document.getElementById('down').addEventListener('click', ()=>{ if(dir.y!==-1) dir={x:0,y:1}; });
 document.getElementById('left').addEventListener('click', ()=>{ if(dir.x!==1) dir={x:-1,y:0}; });
 document.getElementById('right').addEventListener('click', ()=>{ if(dir.x!==-1) dir={x:1,y:0}; });
 
-// Botões de jogo
+// Botões do jogo
 startBtn.addEventListener('click', ()=>{ paused=false; reset(); });
 pauseBtn.addEventListener('click', ()=>{ paused=!paused; if(!paused) run(); pauseBtn.textContent=paused?'Retomar':'Pausar'; });
 speedUp.addEventListener('click', ()=>{ if(speed<20) speed++; tickInterval=1000/speed; });
@@ -193,6 +197,3 @@ reset();
 </script>
 </body>
 </html>
-
-
-
