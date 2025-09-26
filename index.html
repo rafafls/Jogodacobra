@@ -1,211 +1,54 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Jogo da Cobrinha</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-  :root{--bg:#000000;--panel:#0b1220;--accent:#16a34a;--muted:#94a3b8}
-  *{box-sizing:border-box;font-family:Inter,Segoe UI,Arial,sans-serif}
-  body{margin:0;min-height:100vh;display:flex;justify-content:center;align-items:center;background:#000000;color:#e6eef8;overflow:hidden;}
-  .container{width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:10px;padding:10px}
-  canvas{background:#071127;border-radius:12px;display:block;width:100%;height:auto;}
-  .panel{background:rgba(255,255,255,.02);padding:12px;border-radius:12px;width:100%;color:#e6eef8;text-align:center}
-  h1{font-size:16px;margin:0 0 8px;text-align:center}
-  .controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px}
-  button{background:#0b1220;border:1px solid rgba(255,255,255,.04);padding:6px 10px;border-radius:8px;color:#e6eef8;cursor:pointer;font-size:12px}
-  .btn-primary{background:linear-gradient(90deg,#10b981,#059669);border:none;padding:8px 12px;font-weight:600}
-  .score{font-size:14px;color:var(--muted);margin-top:4px;text-align:center}
-  .dir-buttons{display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:10px;gap:5px;}
-  .dir-buttons .row{display:flex;gap:5px;}
-  .dir-buttons button{width:60px;height:60px;font-size:18px;font-weight:bold;}
-  ol{margin:4px 0 0 18px;padding:0;color:var(--muted)}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Jogo da Cobrinha</title>
+  <!-- Link para CSS externo -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="container">
-  <canvas id="game"></canvas>
-  <div class="panel">
-    <h1>Jogo da Cobrinha</h1>
-    <div class="score">Pontuação: <strong id="score">0</strong></div>
-    <div class="controls">
-      <button id="start" class="btn-primary">Iniciar / Reiniciar</button>
-      <button id="pause">Pausar</button>
-      <button id="speedDown">— Velocidade</button>
-      <button id="speedUp">+ Velocidade</button>
-    </div>
-    <div style="margin-top:8px;">
-      <label><input type="checkbox" id="wrap"> Voltar pelas bordas</label>
-    </div>
+  <div class="container">
+    <!-- Canvas do jogo -->
+    <canvas id="game"></canvas>
 
-    <!-- BOTÕES DE DIREÇÃO -->
-    <div class="dir-buttons">
-      <div class="row"><button id="up">↑</button></div>
-      <div class="row"><button id="left">←</button><button id="down">↓</button><button id="right">→</button></div>
-    </div>
+    <!-- Painel com informações e controles -->
+    <div class="panel">
+      <h1>Jogo da Cobrinha</h1>
 
-    <div style="margin-top:8px;">Melhores Pontuações</div>
-    <ol id="highscoreList"></ol>
+      <!-- Pontuação -->
+      <div class="score">Pontuação: <strong id="score">0</strong></div>
+
+      <!-- Controles do jogo -->
+      <div class="controls">
+        <button id="start" class="btn-primary">Iniciar / Reiniciar</button>
+        <button id="pause">Pausar</button>
+        <button id="speedDown">— Velocidade</button>
+        <button id="speedUp">+ Velocidade</button>
+      </div>
+
+      <!-- Checkbox para voltar pelas bordas -->
+      <div style="margin-top:8px;">
+        <label><input type="checkbox" id="wrap"> Voltar pelas bordas</label>
+      </div>
+
+      <!-- Botões de direção (para toque / celular) -->
+      <div class="dir-buttons">
+        <div class="row"><button id="up">↑</button></div>
+        <div class="row">
+          <button id="left">←</button>
+          <button id="down">↓</button>
+          <button id="right">→</button>
+        </div>
+      </div>
+
+      <!-- Melhores pontuações -->
+      <div style="margin-top:8px;">Melhores Pontuações</div>
+      <ol id="highscoreList"></ol>
+    </div>
   </div>
-</div>
 
-<script>
-const canvas = document.getElementById('game');
-const ctx = canvas.getContext('2d');
-const scoreEl = document.getElementById('score');
-const startBtn = document.getElementById('start');
-const pauseBtn = document.getElementById('pause');
-const speedUp = document.getElementById('speedUp');
-const speedDown = document.getElementById('speedDown');
-const wrapCheckbox = document.getElementById('wrap');
-const highscoreListEl = document.getElementById('highscoreList');
-
-const GRID = 26;
-let CELL;
-
-let snake, dir, pendingDir, food, loopId, speed, paused, score, gameOverFlag;
-let highscores = JSON.parse(localStorage.getItem('snakeHighscores')) || [];
-
-const snakeImg = new Image();
-snakeImg.src = 'cobra.png';
-const foodImg = new Image();
-foodImg.src = 'comida.png';
-
-// Canvas proporcional
-function resizeCanvas() {
-  const size = Math.min(window.innerWidth - 20, 300);
-  canvas.width = size;
-  canvas.height = size;
-  CELL = canvas.width / GRID;
-}
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
-
-function reset(){
-  snake = [{x:12,y:12},{x:11,y:12},{x:10,y:12}];
-  dir={x:1,y:0}; pendingDir=null;
-  placeFood();
-  speed=8; paused=false; score=0; gameOverFlag=false;
-  scoreEl.textContent=score;
-  updateHighscoreDisplay();
-  if(loopId) cancelAnimationFrame(loopId);
-  lastTime=0; tickInterval=1000/speed;
-  run();
-}
-
-function placeFood(){
-  while(true){
-    const fx = Math.floor(Math.random()*GRID);
-    const fy = Math.floor(Math.random()*GRID);
-    if(!snake.some(s=>s.x===fx&&s.y===fy)){ food={x:fx,y:fy}; break; }
-  }
-}
-
-function draw(){
-  ctx.fillStyle='#071127';
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-
-  // grade branca
-  ctx.strokeStyle='rgba(255,255,255,0.15)';
-  ctx.lineWidth=1;
-  for(let i=0;i<=GRID;i++){
-    ctx.beginPath(); ctx.moveTo(i*CELL,0); ctx.lineTo(i*CELL,canvas.height); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(0,i*CELL); ctx.lineTo(canvas.width,i*CELL); ctx.stroke();
-  }
-
-  const foodSize=CELL*0.9;
-  ctx.drawImage(foodImg, food.x*CELL+(CELL-foodSize)/2, food.y*CELL+(CELL-foodSize)/2, foodSize, foodSize);
-
-  const snakeSize=CELL*0.9;
-  for(let i=0;i<snake.length;i++){
-    const s=snake[i];
-    ctx.drawImage(snakeImg, s.x*CELL+(CELL-snakeSize)/2, s.y*CELL+(CELL-snakeSize)/2, snakeSize, snakeSize);
-  }
-
-  if(gameOverFlag){
-    ctx.fillStyle='#ff0000';
-    ctx.font='18px "Press Start 2P", monospace';
-    ctx.textAlign='center';
-    ctx.fillText('MORREU KKKKK', canvas.width/2, canvas.height/2);
-    ctx.fillStyle='#ffffff';
-    ctx.font='12px "Press Start 2P", monospace';
-    ctx.fillText('Pontuação: '+score, canvas.width/2, canvas.height/2+20);
-  }
-}
-
-function update(){
-  // aplica direção pendente
-  if(pendingDir){ dir = pendingDir; pendingDir=null; }
-
-  const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
-  if(wrapCheckbox.checked){
-    head.x=(head.x+GRID)%GRID; head.y=(head.y+GRID)%GRID;
-  } else {
-    if(head.x<0||head.y<0||head.x>=GRID||head.y>=GRID){ gameOver(); return; }
-  }
-  if(snake.some(s=>s.x===head.x&&s.y===head.y)){ gameOver(); return; }
-  snake.unshift(head);
-  if(head.x===food.x&&head.y===food.y){ score++; scoreEl.textContent=score; placeFood(); }
-  else snake.pop();
-}
-
-function gameOver(){
-  paused=true;
-  cancelAnimationFrame(loopId);
-  gameOverFlag=true;
-  highscores.push(score);
-  highscores.sort((a,b)=>b-a);
-  highscores=highscores.slice(0,5);
-  localStorage.setItem('snakeHighscores',JSON.stringify(highscores));
-  updateHighscoreDisplay();
-  draw();
-}
-
-function updateHighscoreDisplay(){
-  highscoreListEl.innerHTML='';
-  highscores.forEach(s=>{ const li=document.createElement('li'); li.textContent=s; highscoreListEl.appendChild(li); });
-}
-
-let lastTime=0; let tickInterval=1000/8;
-function run(time){
-  loopId=requestAnimationFrame(run);
-  if(paused){ draw(); return; }
-  if(!time) time=performance.now();
-  const dt=time-lastTime;
-  if(dt<tickInterval) return;
-  lastTime=time;
-  update();
-  draw();
-}
-
-// Teclado
-window.addEventListener('keydown', e=>{
-  if(e.key===' '){ paused=!paused; if(!paused) run(); e.preventDefault(); return; }
-  const map={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0], w:[0,-1],s:[0,1],a:[-1,0],d:[1,0]};
-  const k=e.key.length===1? e.key.toLowerCase() : e.key;
-  const dir2=map[k];
-  if(dir2){
-    if(dir.x===-dir2[0]&&dir.y===-dir2[1]) return;
-    pendingDir={x:dir2[0],y:dir2[1]};
-  }
-});
-
-// Botões de direção
-document.getElementById('up').addEventListener('click', ()=>{ if(dir.y!==1) pendingDir={x:0,y:-1}; });
-document.getElementById('down').addEventListener('click', ()=>{ if(dir.y!==-1) pendingDir={x:0,y:1}; });
-document.getElementById('left').addEventListener('click', ()=>{ if(dir.x!==1) pendingDir={x:-1,y:0}; });
-document.getElementById('right').addEventListener('click', ()=>{ if(dir.x!==-1) pendingDir={x:1,y:0}; });
-
-// Botões do jogo
-startBtn.addEventListener('click', ()=>{ paused=false; reset(); });
-pauseBtn.addEventListener('click', ()=>{ paused=!paused; if(!paused) run(); pauseBtn.textContent=paused?'Retomar':'Pausar'; });
-speedUp.addEventListener('click', ()=>{ if(speed<20) speed++; tickInterval=1000/speed; });
-speedDown.addEventListener('click', ()=>{ if(speed>3) speed--; tickInterval=1000/speed; });
-
-reset();
-</script>
+  <!-- Script JS externo -->
+  <script src="script.js"></script>
 </body>
 </html>
-
-

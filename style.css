@@ -1,0 +1,75 @@
+/* Fundo do site preto */
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #000000; /* Fundo do site */
+    color: #e6eef8;
+    overflow-x: hidden;
+  }
+  
+  /* Container responsivo para celular */
+  .container {
+    width: 95vw;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+  }
+  
+  /* Canvas responsivo */
+  canvas {
+    background: #071127;      /* Fundo do canvas */
+    border-radius: 12px;
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 95vw;
+  }
+  
+  /* Painel de informações e controles */
+  .panel {
+    background: rgba(255, 255, 255, 0.02);
+    padding: 12px;
+    border-radius: 12px;
+    width: 100%;
+    color: #e6eef8;
+    text-align: center;
+  }
+  
+  /* Título */
+  h1 { font-size: 16px; margin: 0 0 8px; text-align: center; }
+  
+  /* Pontuação */
+  .score { font-size: 14px; color: #94a3b8; margin-top: 4px; text-align: center; }
+  
+  /* Botões */
+  button { 
+    background: #0b1220; 
+    border: 1px solid rgba(255,255,255,.1); 
+    padding:6px 10px; 
+    border-radius:8px; 
+    color:#e6eef8; 
+    cursor:pointer; 
+    font-size:12px; 
+  }
+  
+  /* Botão principal */
+  .btn-primary { 
+    background: linear-gradient(90deg,#10b981,#059669); 
+    border:none; 
+    padding:8px 12px; 
+    font-weight:600; 
+  }
+  
+  /* Botões de direção (celular) */
+  .dir-buttons { display:flex; flex-direction:column; align-items:center; justify-content:center; margin-top:10px; gap:5px; }
+  .dir-buttons .row { display:flex; gap:5px; }
+  .dir-buttons button { width:60px; height:60px; font-size:18px; font-weight:bold; }
+  
+  /* Lista de melhores pontuações */
+  ol { margin:4px 0 0 18px; padding:0; color:#94a3b8; }
