@@ -1,75 +1,134 @@
-/* Fundo do site preto */
+/* Fonte pixelada */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+/* Variáveis de cores */
+:root {
+  --bg: #000000;
+  --panel: #0b1220;
+  --accent: #16a34a;
+  --muted: #94a3b8;
+}
+
+/* Reset básico */
+* {
+  box-sizing: border-box;
+  font-family: Inter, 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Body com scroll liberado */
 body {
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #000000; /* Fundo do site */
-    color: #e6eef8;
-    overflow-x: hidden;
-  }
-  
-  /* Container responsivo para celular */
-  .container {
-    width: 95vw;
-    max-width: 400px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-  }
-  
-  /* Canvas responsivo */
-  canvas {
-    background: #071127;      /* Fundo do canvas */
-    border-radius: 12px;
-    display: block;
-    width: 100%;
-    height: auto;
-    max-height: 95vw;
-  }
-  
-  /* Painel de informações e controles */
-  .panel {
-    background: rgba(255, 255, 255, 0.02);
-    padding: 12px;
-    border-radius: 12px;
-    width: 100%;
-    color: #e6eef8;
-    text-align: center;
-  }
-  
-  /* Título */
-  h1 { font-size: 16px; margin: 0 0 8px; text-align: center; }
-  
-  /* Pontuação */
-  .score { font-size: 14px; color: #94a3b8; margin-top: 4px; text-align: center; }
-  
-  /* Botões */
-  button { 
-    background: #0b1220; 
-    border: 1px solid rgba(255,255,255,.1); 
-    padding:6px 10px; 
-    border-radius:8px; 
-    color:#e6eef8; 
-    cursor:pointer; 
-    font-size:12px; 
-  }
-  
-  /* Botão principal */
-  .btn-primary { 
-    background: linear-gradient(90deg,#10b981,#059669); 
-    border:none; 
-    padding:8px 12px; 
-    font-weight:600; 
-  }
-  
-  /* Botões de direção (celular) */
-  .dir-buttons { display:flex; flex-direction:column; align-items:center; justify-content:center; margin-top:10px; gap:5px; }
-  .dir-buttons .row { display:flex; gap:5px; }
-  .dir-buttons button { width:60px; height:60px; font-size:18px; font-weight:bold; }
-  
-  /* Lista de melhores pontuações */
-  ol { margin:4px 0 0 18px; padding:0; color:#94a3b8; }
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* permite scroll vertical */
+  background: var(--bg);
+  color: #e6eef8;
+  overflow-y: auto; /* libera scroll vertical */
+  padding: 20px 0; /* espaço em cima e embaixo */
+}
+
+/* Container do jogo */
+.container {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+}
+
+/* Canvas do jogo */
+canvas {
+  background: #071127; /* fundo do jogo */
+  border-radius: 12px;
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Painel de informações */
+.panel {
+  background: rgba(255,255,255,0.02);
+  padding: 12px;
+  border-radius: 12px;
+  width: 100%;
+  color: #e6eef8;
+  text-align: center;
+}
+
+/* Título do jogo */
+h1 {
+  font-size: 16px;
+  margin: 0 0 8px;
+  text-align: center;
+}
+
+/* Controles */
+.controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+button {
+  background: var(--panel);
+  border: 1px solid rgba(255,255,255,.04);
+  padding: 6px 10px;
+  border-radius: 8px;
+  color: #e6eef8;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, #10b981, #059669);
+  border: none;
+  padding: 8px 12px;
+  font-weight: 600;
+}
+
+/* Pontuação */
+.score {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 4px;
+  text-align: center;
+}
+
+/* Botões de direção */
+.dir-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  gap: 5px;
+}
+
+.dir-buttons .row {
+  display: flex;
+  gap: 5px;
+}
+
+.dir-buttons button {
+  width: 60px;
+  height: 60px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Lista de melhores pontuações */
+ol {
+  margin: 4px 0 0 18px;
+  padding: 0;
+  color: var(--muted);
+}
