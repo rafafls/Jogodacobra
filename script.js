@@ -135,7 +135,7 @@ function drawGameOver(){
     ]
   };
 
-  const text = 'MORREU KKKK';
+  const text = 'MORREU KKKKK';
   let xOffset = 0;
 
   ctx.fillStyle = '#ff0000';
@@ -154,11 +154,11 @@ function drawGameOver(){
     xOffset += map[0].length * pixelSize + pixelSize; // espaço entre letras
   }
 
-  // Pontuação abaixo
+  // Pontuação abaixo (maior que antes)
   ctx.fillStyle = '#ffffff';
-  ctx.font = `${pixelSize*1.5}px "Press Start 2P", monospace`;
+  ctx.font = `${pixelSize*3}px "Press Start 2P", monospace`; // aumentei aqui
   ctx.textAlign='center';
-  ctx.fillText('Pontuação: '+score, canvas.width/2, startY + pixelSize*7);
+  ctx.fillText('Pontuação: '+score, canvas.width/2, startY + pixelSize*9);
 }
 
 // Atualiza lógica
