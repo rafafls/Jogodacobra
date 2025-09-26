@@ -6,9 +6,9 @@
 <title>Jogo da Cobrinha</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-  :root{--bg:#0f1724;--panel:#0b1220;--accent:#16a34a;--muted:#94a3b8}
+  :root{--bg:#000000;--panel:#0b1220;--accent:#16a34a;--muted:#94a3b8}
   *{box-sizing:border-box;font-family:Inter,Segoe UI,Arial,sans-serif}
-  body{margin:0;min-height:100vh;display:flex;justify-content:center;align-items:center;background:linear-gradient(180deg,#071226,#0b1220);color:#e6eef8;overflow:hidden;}
+  body{margin:0;min-height:100vh;display:flex;justify-content:center;align-items:center;background:#000000;color:#e6eef8;overflow:hidden;}
   .container{width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:10px;padding:10px}
   canvas{background:#071127;border-radius:12px;display:block;width:100%;height:auto;}
   .panel{background:rgba(255,255,255,.02);padding:12px;border-radius:12px;width:100%;color:#e6eef8;text-align:center}
@@ -51,7 +51,6 @@
 </div>
 
 <script>
-// --- Mesma lógica do jogo ---
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 const scoreEl = document.getElementById('score');
@@ -65,7 +64,7 @@ const highscoreListEl = document.getElementById('highscoreList');
 const GRID = 26;
 let CELL;
 
-let snake, dir, food, loopId, speed, paused, score, gameOverFlag;
+let snake, dir, pendingDir, food, loopId, speed, paused, score, gameOverFlag;
 let highscores = JSON.parse(localStorage.getItem('snakeHighscores')) || [];
 
 const snakeImg = new Image();
@@ -83,10 +82,9 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-// Funções do jogo
 function reset(){
   snake = [{x:12,y:12},{x:11,y:12},{x:10,y:12}];
-  dir={x:1,y:0};
+  dir={x:1,y:0}; pendingDir=null;
   placeFood();
   speed=8; paused=false; score=0; gameOverFlag=false;
   scoreEl.textContent=score;
@@ -107,18 +105,24 @@ function placeFood(){
 function draw(){
   ctx.fillStyle='#071127';
   ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.strokeStyle='rgba(255,255,255,0.02)'; ctx.lineWidth=1;
+
+  // grade branca
+  ctx.strokeStyle='rgba(255,255,255,0.15)';
+  ctx.lineWidth=1;
   for(let i=0;i<=GRID;i++){
     ctx.beginPath(); ctx.moveTo(i*CELL,0); ctx.lineTo(i*CELL,canvas.height); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(0,i*CELL); ctx.lineTo(canvas.width,i*CELL); ctx.stroke();
   }
+
   const foodSize=CELL*0.9;
   ctx.drawImage(foodImg, food.x*CELL+(CELL-foodSize)/2, food.y*CELL+(CELL-foodSize)/2, foodSize, foodSize);
+
   const snakeSize=CELL*0.9;
   for(let i=0;i<snake.length;i++){
     const s=snake[i];
     ctx.drawImage(snakeImg, s.x*CELL+(CELL-snakeSize)/2, s.y*CELL+(CELL-snakeSize)/2, snakeSize, snakeSize);
   }
+
   if(gameOverFlag){
     ctx.fillStyle='#ff0000';
     ctx.font='18px "Press Start 2P", monospace';
@@ -131,6 +135,9 @@ function draw(){
 }
 
 function update(){
+  // aplica direção pendente
+  if(pendingDir){ dir = pendingDir; pendingDir=null; }
+
   const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
   if(wrapCheckbox.checked){
     head.x=(head.x+GRID)%GRID; head.y=(head.y+GRID)%GRID;
@@ -172,20 +179,23 @@ function run(time){
   draw();
 }
 
-// Controles por teclado
+// Teclado
 window.addEventListener('keydown', e=>{
   if(e.key===' '){ paused=!paused; if(!paused) run(); e.preventDefault(); return; }
   const map={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0], w:[0,-1],s:[0,1],a:[-1,0],d:[1,0]};
   const k=e.key.length===1? e.key.toLowerCase() : e.key;
   const dir2=map[k];
-  if(dir2){ if(dir.x===-dir2[0]&&dir.y===-dir2[1]) return; dir={x:dir2[0],y:dir2[1]}; }
+  if(dir2){
+    if(dir.x===-dir2[0]&&dir.y===-dir2[1]) return;
+    pendingDir={x:dir2[0],y:dir2[1]};
+  }
 });
 
 // Botões de direção
-document.getElementById('up').addEventListener('click', ()=>{ if(dir.y!==1) dir={x:0,y:-1}; });
-document.getElementById('down').addEventListener('click', ()=>{ if(dir.y!==-1) dir={x:0,y:1}; });
-document.getElementById('left').addEventListener('click', ()=>{ if(dir.x!==1) dir={x:-1,y:0}; });
-document.getElementById('right').addEventListener('click', ()=>{ if(dir.x!==-1) dir={x:1,y:0}; });
+document.getElementById('up').addEventListener('click', ()=>{ if(dir.y!==1) pendingDir={x:0,y:-1}; });
+document.getElementById('down').addEventListener('click', ()=>{ if(dir.y!==-1) pendingDir={x:0,y:1}; });
+document.getElementById('left').addEventListener('click', ()=>{ if(dir.x!==1) pendingDir={x:-1,y:0}; });
+document.getElementById('right').addEventListener('click', ()=>{ if(dir.x!==-1) pendingDir={x:1,y:0}; });
 
 // Botões do jogo
 startBtn.addEventListener('click', ()=>{ paused=false; reset(); });
@@ -197,5 +207,3 @@ reset();
 </script>
 </body>
 </html>
-
-
