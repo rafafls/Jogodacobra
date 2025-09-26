@@ -233,5 +233,5 @@ pauseBtn.addEventListener('click', ()=>{ paused=!paused; if(!paused) run(); paus
 speedUp.addEventListener('click', ()=>{ if(speed<20) speed++; tickInterval=1000/speed; });
 speedDown.addEventListener('click', ()=>{ if(speed>3) speed--; tickInterval=1000/speed; });
 
-// Inicia o jogo
+// Inicia o jogoo
 reset();
